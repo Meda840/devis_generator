@@ -1,0 +1,22 @@
+{
+    "devis": {
+      "number": "Quote N°",
+      "companyName": "Your Name / Company",
+      "siret": "Siret",
+      "clientName": "Client Name",
+      "clientSiret": "Client Siret"
+    },
+    "table": {
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "totalPrice": "Total Price"
+    },
+    "labels": {
+      "totalHT": "Total HT",
+      "tva": "VAT (20%)",
+      "totalTTC": "Total TTC",
+      "addLine": "Add Line"
+    }
+  }
+  

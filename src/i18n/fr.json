@@ -1,0 +1,23 @@
+{
+    "devis": {
+      "number": "Devis N°",
+      "companyName": "Votre nom / société",
+      "siret": "Siret",
+      "clientName": "Nom client",
+      "clientSiret": "Siret client",
+      "adressPro" : "Addresse"
+    },
+    "table": {
+      "description": "Description",
+      "quantity": "Quantité",
+      "unitPrice": "Prix unitaire HT",
+      "totalPrice": "Prix total HT"
+    },
+    "labels": {
+      "totalHT": "Total HT",
+      "tva": "TVA (20%)",
+      "totalTTC": "Total TTC",
+      "addLine": "Ajouter une ligne"
+    }
+  }
+  

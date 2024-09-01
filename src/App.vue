@@ -1,26 +1,34 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <v-app>
+    <CustomAppBar />
+    <v-main>
+      <router-view></router-view>
+    </v-main>
+    <v-footer app padless>
+      <v-col class="text-center" cols="12">
+        &copy; 2024 - Medev
+      </v-col>
+    </v-footer>
+  </v-app>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+import { defineComponent } from 'vue';
+import CustomAppBar from './components/CustomAppBar.vue';
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+defineComponent({
+  name: "App",
+});
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+/* Custom styles for App.vue */
+.v-app-bar {
+  background-color: #3f51b5;
+  color: white;
+}
+.v-footer {
+  background-color: #3f51b5;
+  color: white;
 }
 </style>
