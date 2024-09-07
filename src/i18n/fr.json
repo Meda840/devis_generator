@@ -15,7 +15,7 @@
     },
     "labels": {
       "totalHT": "Total HT",
-      "tva": "TVA (20%)",
+      "tva": "TVA",
       "totalTTC": "Total TTC",
       "addLine": "Ajouter une ligne"
     }

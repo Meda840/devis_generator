@@ -2,59 +2,90 @@
     <v-container class="mt-5">
       <v-card>
         <v-card-title>
-          <h2 class="card-title">{{ $t('devis.number') }}</h2>
-        </v-card-title>
-        <v-card-text>
-          <section>
-            <div class="d-flex flex-column align-start mt-4">
-              <v-text-field
+          <h2 class="card-title"><v-text-field
                 v-model="devis.number"
                 :label="$t('devis.number')"
                 dense
                 hide-details
                  variant="plain"
-                class="col-5 plain-input mb-0"
-              ></v-text-field>
+                class="col-lg-5 plain-input mb-0"
+              ></v-text-field></h2>
+        </v-card-title>
+        <v-card-text>
+          <section>
+            <div class="d-flex flex-column align-start mt-4">
+              
               <v-text-field
                 v-model="devis.companyName"
-                :label="$t('devis.companyName')"
+                :placeholder="$t('devis.companyName')"
                 dense
                 hide-details
-                 variant="plain"
-                class="col-5 mb-0"
+                variant="plain"
+                class="col-lg-5 col-sm-8 mb-0"
               ></v-text-field>
               <v-text-field
                 v-model="devis.adressPro"
-                :label="$t('devis.adressPro')"
+                :placeholder="$t('devis.adressPro')"
                 dense
                 hide-details
-                  variant="plain"
-                class="col-5 mb-0"
+                variant="plain"
+                class="col-lg-5 col-sm-8 mb-0"
+              ></v-text-field>
+              <v-text-field
+                v-model="devis.cityPro"
+                :placeholder="$t('Code Postal')"
+                dense
+                hide-details
+                variant="plain"
+                class="col-lg-5 col-sm-8 mb-0"
+              ></v-text-field>
+              <v-text-field
+                v-model="devis.cityPro"
+                :placeholder="$t('Ville')"
+                dense
+                hide-details
+                variant="plain"
+                class="col-lg-5 col-sm-8 mb-0"
               ></v-text-field>
               <v-text-field
                 v-model="devis.siret"
                 :label="$t('devis.siret')"
                 dense
                 hide-details
-                 variant="plain"
-                class="col-5  plain-input mb-0"
+                variant="plain"
+                class="col-lg-5 col-sm-8 plain-input mb-0"
               ></v-text-field>
             </div>
     
          <div class="d-flex flex-column align-end">
                 <v-text-field 
                   v-model="devis.clientName"
-                  :label="$t('devis.clientName')"
+                  :placeholder="$t('devis.clientName')"
                   hide-details
                     variant="plain"
-                  class="col-3 mb-0"> 
+                  class="col-lg-3  col-sm-6 mb-0"> 
                 </v-text-field>
+                <v-text-field 
+                  v-model="devis.clientAdress"
+                  :placeholder="$t('devis.adressPro')"
+                  hide-details
+                    variant="plain"
+                  class="col-lg-3 col-sm-6 mb-0"> 
+                </v-text-field>
+                <v-text-field
+                v-model="devis.cityClient"
+                :placeholder="$t('Code Postal Ville')"
+                dense
+                hide-details
+                  variant="plain"
+                class="col-lg-3 col-sm-6 mb-0"
+              ></v-text-field>
                 <v-text-field
                   v-model="devis.clientSiret"
                   :label="$t('devis.clientSiret')"
                   hide-details
                    variant="plain"
-                  class="col-3 mb-4">
+                  class="col-lg-3  col-sm-6 mb-4">
                 </v-text-field>
             </div>
           </section>
@@ -66,10 +97,10 @@
                 <template v-slot:default>
                   <thead>
                     <tr>
-                      <th class="col-8">{{ $t('table.description') }}</th>
+                      <th class="col-7">{{ $t('table.description') }}</th>
                       <th class="col-1">{{ $t('table.quantity') }}</th>
-                      <th class="col-1">{{ $t('table.unitPrice') }}</th>
-                      <th class="col">{{ $t('table.totalPrice') }}</th>
+                      <th class="col-2">{{ $t('table.unitPrice') }}</th>
+                      <th class="col-2">{{ $t('table.totalPrice') }}</th>
                       <th></th> <!-- Empty header for the delete icon -->
                     </tr>
                   </thead>
@@ -79,6 +110,7 @@
                         <v-text-field
                         density="compact"
                           v-model="item.description"
+                          placeholder="description de la tâche"
                           outlined
                           variant="plain"
                         ></v-text-field>
@@ -119,35 +151,99 @@
               </v-simple-table>
             </v-col>
           </v-row>
-          <v-btn @click="addItem" color="primary">
+          <v-btn @click="addItem" color="primary" class="mt-2">
             {{ $t('labels.addLine') }}
           </v-btn>
   
           <!-- Bottom Section - Automatic Calculation -->
-          <div class="d-flex flex-column align-end">
-            <v-simple-table dense class="invoice-totals-table">
+          
+  <v-container>
+    <v-row class="justify-end">
+      <v-col cols="auto">
+        <v-card
+          class="mx-auto"
+          width="280"
+          outlined
+          variant = 'tonal'
+          color="primary"
+        >
+          <!-- Title slot -->
+          <template v-slot:title>
+            <span class="">{{ $t('Réglages') }}</span>
+          </template>
+
+          <!-- Card content -->
+          <v-card-text class="bg-surface-light pt-4">
+            <h6>{{ $t('Activer la TVA') }}</h6>
+            
+            <v-radio-group
+              v-model="tvaEnabled"
+              direction="horizontal"
+              inline
+              @change="handleTvaChange"
+            >
+              <v-radio
+                label="Oui"
+                value="1"
+              ></v-radio>
+              <v-radio
+                label="Non"
+                value="0"
+              ></v-radio>
+            </v-radio-group>
+
+            <v-text-field
+              v-show="tvaEnabled === '1'"
+              v-model="devis.tvaRate"
+              label="Taux de TVA (en %)"
+              type="number"
+              :style="{ width: '200px', fontSize: '14px' }"
+              class="mt-3"
+              outlined
+              dense
+            ></v-text-field>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+
+
+
+        <!--TOTAL TABLE  --> 
+        <v-col  cols="12" >
+          <div class="d-flex flex-column align-end" >
+            <v-simple-table dense class="invoice-totals-table" >
               <tbody>
                 <tr>
-                  <td class="text-right font-weight-medium">{{ $t('labels.totalHT') }}</td>
+                  <td class="text-right font-weight-medium" style="width:200px">{{ $t('labels.totalHT') }}</td>
                   <td class="text-right">{{ totalHT.toFixed(2) }} €</td>
                 </tr>
                 <tr>
-                  <td class="text-right font-weight-medium">{{ $t('labels.tva') }} ({{ tvaTaux }}%)</td>
+                  <td class="text-right font-weight-medium" style="width:200px">{{ $t('labels.tva') }} ({{ devis.tvaRate }}%)</td>
                   <td class="text-right">{{ tva.toFixed(2) }} €</td>
                 </tr>
                 <tr class="total-ttc">
-                  <td class="text-right font-weight-bold">{{ $t('labels.totalTTC') }}</td>
+                  <td class="text-right font-weight-bold" style="width:200px">{{ $t('labels.totalTTC') }}</td>
                   <td class="text-right font-weight-bold">{{ totalTTC.toFixed(2) }} €</td>
                 </tr>
               </tbody>
             </v-simple-table>
           </div>
+        </v-col>
+
+        <!-- Submit Button -->
+        <v-btn @click="submitDevis" color="success" class="mt-5">
+          {{ $t('Génerer le pdf') }}
+        </v-btn>
+
         </v-card-text>
       </v-card>
     </v-container>
   </template>
   
   <script>
+  import axios from 'axios';
   export default {
     data() {
       return {
@@ -155,12 +251,18 @@
           number: 1,
           companyName: "",
           adressPro : "",
+          cityPro: "",
           siret: "",
           clientName: "",
+          clientAdress:"",
+          cityClient :"",
           clientSiret: "",
+          tvaRate: 20,
           items: [{ description: "", quantity: 1, unitPrice: 0, totalPrice: 0 }],
         },
-        taxRate: 0.2, // 20% VAT
+       
+        
+        tvaEnabled : '1',
       };
     },
   
@@ -169,7 +271,11 @@
         return this.devis.items.reduce((sum, item) => sum + item.totalPrice, 0);
       },
       tva() {
-        return this.totalHT * this.taxRate;
+        if(this.tvaEnabled =='1'){
+        return this.totalHT * (this.devis.tvaRate /100);
+        } return 0;
+
+
       },
       totalTTC() {
         return this.totalHT + this.tva;
@@ -191,6 +297,77 @@
       removeItem(index) {
         this.devis.items.splice(index, 1); 
       },
+      handleTvaChange(value) {
+      if (value.target.value === '0') {
+        this.devis.tvaRate = 0;
+        
+      }
+      console.log("event radio")
+    },
+
+      async fetchCsrfCookie() {
+      try {
+        // This request will set the CSRF token cookie
+        await axios.get('https://devis.medadev.com/sanctum/csrf-cookie');
+      } catch (error) {
+        console.error('Failed to fetch CSRF cookie:', error);
+      }
+    },
+      async submitDevis() {
+        await this.fetchCsrfCookie();
+      try {
+        const response = await axios.post("https://devis.medadev.com/api/devis", {
+          pro_name: this.devis.companyName,
+          pro_address: this.devis.adressPro,
+          pro_city: this.devis.cityPro,
+          pro_siret: this.devis.siret,
+          client_name: this.devis.clientName,
+          client_address: this.devis.clientAdress,
+          client_city: this.devis.cityClient,
+          client_siret: this.devis.clientSiret,
+          description: this.devis.number, // TODO CHANGE add new field for devis number,
+          amount: this.totalHT,
+          tax_rate : this.devis.tvaRate,  
+          date_devis: new Date().toISOString().split("T")[0],
+          tasks: this.devis.items.map(item => ({
+            item_description: item.description,
+            item_price: item.unitPrice,
+            item_quantity: item.quantity,
+          })),
+        });
+        console.log(response.data);
+        const devisId = response.data.devis.id; // change id by uuid
+        this.generatePdf(devisId);
+       // alert("Devis successfully submitted!");
+      } catch (error) {
+        console.error(error);
+        alert("Verifier tout vos information.");
+      }
+    },
+
+    async generatePdf(devisId) {
+      try {
+        
+        const response = await axios.get(`https://devis.medadev.com/api/generate-pdf/${devisId}`, {
+          responseType: 'blob', // Important for receiving binary data
+        });
+
+        // Create a Blob from the PDF Stream
+        const file = new Blob([response.data], { type: 'application/pdf' });
+
+        // Create a link element, use it to download the blob, then remove it
+        const fileURL = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = fileURL;
+        link.download = `devis_${devisId}.pdf`;
+        link.click();
+        URL.revokeObjectURL(fileURL);
+
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+      }
+    },
     },
   };
   </script>
@@ -248,5 +425,22 @@
   th {
     background-color: #f7f7f7;
   }
+  .invoice-totals-table td {
+  padding: 8px 12px; /* Adjust padding as necessary */
+}
+
+/* Style the left cells with a grey background */
+.invoice-totals-table td:first-child {
+  background-color: #f5f5f5; /* light grey background */
+}
+
+/* Style for the total TTC row specifically */
+.invoice-totals-table tr.total-ttc td:first-child {
+  background-color: #e0e0e0; /* slightly darker grey for emphasis */
+}
+/* Keep the right cells (values) with a white background */
+.invoice-totals-table td:last-child {
+  background-color: white;
+}
   </style>
   
