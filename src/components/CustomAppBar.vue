@@ -1,7 +1,13 @@
 <template>
   <v-app-bar app>
-    <v-toolbar-title>Devis Generator</v-toolbar-title>
+    <v-app-bar-nav-icon icon="mdi-home" @click="navigateToHome"></v-app-bar-nav-icon>
+    <v-toolbar-title >
+      Devis Generator
+    </v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-btn text @click="navigateToLogin">
+      Connexion
+    </v-btn>
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props">
@@ -22,6 +28,7 @@
         </v-list-item>
       </v-list>
     </v-menu>
+   
   </v-app-bar>
 </template>
 
@@ -44,6 +51,12 @@ export default {
     changeLanguage(code) {
       this.$i18n.locale = code;
     },
+    navigateToHome() {
+      this.$router.push({ name: 'DevisPage' }); // Adjust the route name as needed
+    },
+    navigateToLogin() {
+      this.$router.push({ name: 'login' }); // Adjust the route name as needed
+    }
   },
 };
 </script>
