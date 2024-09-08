@@ -135,7 +135,7 @@
                           @input="calculateTotal(index)"
                         ></v-text-field>
                       </td>
-                      <td>{{ item.totalPrice.toFixed(2) }} €</td>
+                      <td>{{formatCurrency( item.totalPrice) }}</td>
                       <td>
                     <v-icon
                       color="red"
@@ -156,62 +156,82 @@
           </v-btn>
   
           <!-- Bottom Section - Automatic Calculation -->
-          
-  <v-container>
-    <v-row class="justify-end">
-      <v-col cols="auto">
-        <v-card
-          
-          title ='Réglages'
-          class="mx-auto ma-1 pa-1"
-          width="330"
-          outlined
-          variant = 'tonal'
-          color="primary"
-        >
-      
-
-          <!-- Card content -->
-          <v-card-text class="bg-surface-light ">
+                
+        <v-container>
+          <v-row class="justify-end">
+            <v-col cols="auto">
+              <v-card
+                
+                title ='Réglages'
+                class="mx-auto ma-1 pa-1"
+                width="330"
+                outlined
+                variant = 'tonal'
+                color="primary"
+              >
             
-            <div class="d-flex justify-content-between align-items-center" >
-              <div class="mr-3" :class="{ 'mt-2': tvaEnabled === '0' }">
-               <span class="ml-2">{{ $t('Activer la TVA') }}</span>
-          
-                <v-radio-group
-                  v-model="tvaEnabled"
-                  direction="horizontal"
-                  inline
-                  @change="handleTvaChange"
+
+                <!-- Card content -->
+                <v-card-text class="bg-surface-light ">
                   
+                  <div class="d-flex justify-content-between align-items-center" >
+                    <div class="mr-3" :class="{ 'mt-2': tvaEnabled === '0' }">
+                    <span class="ml-2">{{ $t('Activer la TVA') }}</span>
+                
+                      <v-radio-group
+                        v-model="tvaEnabled"
+                        direction="horizontal"
+                        inline
+                        @change="handleTvaChange"
+                        
+                      >
+                        <v-radio
+                          label="Oui"
+                          value="1"
+                        ></v-radio>
+                        <v-radio
+                          label="Non"
+                          value="0"
+                        ></v-radio>
+                      </v-radio-group>
+                    </div>
+                  
+                  <v-text-field
+                    v-show="tvaEnabled === '1'"
+                    v-model="devis.tvaRate"
+                    label="TVA (en %)"
+                    type="number"
+                    :style="{ width: '30px', fontSize: '14px' }"
+                    class="mt-3"
+                    variant ="solo"
+                    dense
+                  ></v-text-field>
+                </div>
+
+                <v-divider class="my-2"></v-divider>
+                <v-select
+                  v-model="selectedCurrency"
+                  :items="currencyCodes"
+                  item-value="code"
+                  item-text="name"
+                  label="Select Currency"
+                  return-object
+                  :menu-props="{ maxHeight: '400' }"
+                  class="mt-3"
                 >
-                  <v-radio
-                    label="Oui"
-                    value="1"
-                  ></v-radio>
-                  <v-radio
-                    label="Non"
-                    value="0"
-                  ></v-radio>
-                </v-radio-group>
-              </div>
-            <!-- TODO when enabled adjest to default value 20%-->
-            <v-text-field
-              v-show="tvaEnabled === '1'"
-              v-model="devis.tvaRate"
-              label="TVA (en %)"
-              type="number"
-              :style="{ width: '30px', fontSize: '14px' }"
-              class="mt-3"
-              variant ="solo"
-              dense
-            ></v-text-field>
-          </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+              <template v-slot:prepend-item>
+                <v-list-item ripple>
+                  <v-list-item-content>
+                    <v-list-item-title>{{$t('Default Currency')}}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
 
 
 
@@ -222,15 +242,15 @@
               <tbody>
                 <tr>
                   <td class="text-right font-weight-medium" style="width:260px">{{ $t('labels.totalHT') }}</td>
-                  <td class="text-right">{{ totalHT.toFixed(2) }} €</td>
+                  <td class="text-right">{{ formatCurrency(totalHT) }} </td>
                 </tr>
                 <tr>
                   <td class="text-right font-weight-medium" style="width:260px">{{ $t('labels.tva') }} ({{ devis.tvaRate }}%)</td>
-                  <td class="text-right">{{ tva.toFixed(2) }} €</td>
+                  <td class="text-right">{{ formatCurrency(tva) }}</td>
                 </tr>
                 <tr class="total-ttc">
                   <td class="text-right font-weight-bold" style="width:260px">{{ $t('labels.totalTTC') }}</td>
-                  <td class="text-right font-weight-bold">{{ totalTTC.toFixed(2) }} €</td>
+                  <td class="text-right font-weight-bold">{{ formatCurrency(totalTTC) }}</td>
                 </tr>
               </tbody>
             </v-simple-table>
@@ -249,7 +269,40 @@
   
   <script>
     import axios from 'axios';
+    import { ref, onMounted, computed } from 'vue'; 
+    import { useInfoGeneralStore } from '@/stores/InfoGeneral';
     export default {
+      setup() {
+      const infoGeneralStore = useInfoGeneralStore();
+      const selectedCurrency = ref(null);
+    // Fetch currencies when component is mounted
+      onMounted(() => {
+          infoGeneralStore.fetchCurrencies().then(() => {
+              // Set the default selected currency to the first item in the list
+            if (infoGeneralStore.currencies.length > 0) {
+                selectedCurrency.value = infoGeneralStore.currencies[0].code;
+               
+            }
+          });
+        });
+        const currencyCodes = computed(() => 
+          infoGeneralStore.currencies.map(currency => currency.code)       
+        );
+        const formatCurrency = (amount) => {
+          const currency = infoGeneralStore.currencies.find(currency => currency.code === selectedCurrency.value);
+          if (currency && currency.symbol) {
+            return `${amount.toFixed(2)} ${currency.symbol}`;
+          }
+          return `${amount.toFixed(2)} €`; // Fallback if no currency is selected
+        };
+
+        return {
+            infoGeneralStore,
+            selectedCurrency,
+            currencyCodes,
+            formatCurrency
+        };
+      },
       data() {
         return {
           devis: {
@@ -270,7 +323,6 @@
           tvaEnabled : '1',
         };
       },
-    
       computed: {
         totalHT() {
           return this.devis.items.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -287,6 +339,11 @@
         },
       },
       methods: {
+        getInfo(){
+            console.log('info')
+        },
+
+
         addItem() {
           this.devis.items.push({
             description: "",
@@ -304,10 +361,9 @@
         },
         handleTvaChange(value) {
         if (value.target.value === '0') {
-          this.devis.tvaRate = 0;
-          
+          this.devis.tvaRate = 0;  
         }else this.devis.tvaRate = 20;
-        console.log("event radio")
+       
       },
 
         async fetchCsrfCookie() {
@@ -448,4 +504,4 @@
   background-color: white;
 }
   </style>
-  
+  @/stores/InfoGeneral

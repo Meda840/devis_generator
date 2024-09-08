@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import vuetify from "./plugins/vuetify";
+import { createPinia } from "pinia";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { createI18n } from "vue-i18n";
@@ -19,4 +20,6 @@ const i18n = createI18n({
   messages,
 });
 
-createApp(App).use(router).use(vuetify).use(i18n).mount("#app");
+const pinia = createPinia();
+
+createApp(App).use(router).use(pinia).use(vuetify).use(i18n).mount("#app");
