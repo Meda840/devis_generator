@@ -8,6 +8,16 @@ const routes = [
     component: DevisPage,
   },
   {
+    path: "/dashboard",
+    name: "dashboard",
+    component: () => import("@/pages/DashboardPage.vue"),
+  },
+  {
+    path: "/informations",
+    name: "informations",
+    component: () => import("@/pages/InfoPage.vue"),
+  },
+  {
     path: "/login",
     name: "login",
     component: () => import("@/pages/LoginPage.vue"),

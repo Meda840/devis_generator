@@ -348,7 +348,6 @@
         }else this.devis.tvaRate = 20;
        
       },
-
         async fetchCsrfCookie() {
         try {
           // This request will set the CSRF token cookie
@@ -388,7 +387,6 @@
           alert("Verifier tout vos information.");
         }
       },
-
       async generatePdf(devisId) {
         try {
           

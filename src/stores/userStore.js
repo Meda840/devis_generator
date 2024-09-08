@@ -18,6 +18,7 @@ export const useUserStore = defineStore("user", {
           }
         );
         this.token = response.data.token;
+
         this.user = response.data.user;
         this.isLoggedIn = true;
         // Optionally store token in local storage
@@ -27,6 +28,7 @@ export const useUserStore = defineStore("user", {
         console.error("Login failed:", error.response.data.message);
       }
     },
+
     logout() {
       this.token = null;
       this.user = null;

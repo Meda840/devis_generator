@@ -1,10 +1,10 @@
 <template>
   <v-app>
-    <CustomAppBar />
+    <CustomAppBar v-if="isHomePage" />
     <v-main>
       <router-view></router-view>
     </v-main>
-    <v-footer app padless>
+    <v-footer v-if="isHomePage" app padless>
       <v-col class="text-center" cols="12">
         &copy; 2024 - Medev
       </v-col>
@@ -15,6 +15,12 @@
 <script setup>
 import { defineComponent } from 'vue';
 import CustomAppBar from './components/CustomAppBar.vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+// Reactive reference to check if we are on the dashboard page
+const route = useRoute();
+const isHomePage = computed(() => route.name === 'DevisPage' ||route.name === 'login'||route.name === 'Register' ); // Adjust 'dashboard' to your route name
+
 
 defineComponent({
   name: "App",

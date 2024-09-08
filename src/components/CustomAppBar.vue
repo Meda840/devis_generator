@@ -5,9 +5,13 @@
       Devis Generator
     </v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-btn text @click="navigateToLogin">
-      Connexion
+    <v-btn v-if="!userStore.isLoggedIn" text @click="navigateToLogin">
+    {{ $t('Connexion') }}  
     </v-btn>
+   
+    <v-btn v-else @click="navigateToDashboard" prepend-icon="mdi-view-dashboard" variant="outlined">
+  Dashboard
+</v-btn>
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props">
@@ -33,7 +37,21 @@
 </template>
 
 <script>
+ import { useUserStore } from '@/stores/userStore';
+ import {onMounted } from 'vue'; 
 export default {
+
+  setup() {
+    const userStore = useUserStore();
+    onMounted(() => {
+        userStore.initialize();
+      });
+
+    return {
+      userStore
+    }
+
+  },
   data() {
     return {
       languages: [
@@ -52,11 +70,19 @@ export default {
       this.$i18n.locale = code;
     },
     navigateToHome() {
-      this.$router.push({ name: 'DevisPage' }); // Adjust the route name as needed
+      this.$router.push({ name: 'DevisPage' }); 
     },
     navigateToLogin() {
-      this.$router.push({ name: 'login' }); // Adjust the route name as needed
-    }
+      this.$router.push({ name: 'login' }); 
+    },
+    navigateToDashboard() {
+      this.$router.push({ name: 'dashboard' }); 
+    },
+
+    logout() {
+      this.userStore.logout(); // Call the logout method from the user store
+      this.$router.push({ name: 'login' }); // Redirect to login page after logout
+    },
   },
 };
 </script>

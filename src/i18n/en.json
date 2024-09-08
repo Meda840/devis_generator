@@ -17,6 +17,9 @@
       "tva": "VAT",
       "totalTTC": "Total TTC",
       "addLine": "Add Line"
-    }
+    },
+
+    "Connexion": "login",
+    "Déconnexion": "logout"
   }
   
