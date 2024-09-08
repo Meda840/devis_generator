@@ -161,47 +161,52 @@
     <v-row class="justify-end">
       <v-col cols="auto">
         <v-card
-          class="mx-auto"
-          width="280"
+          
+          title ='Réglages'
+          class="mx-auto ma-1 pa-1"
+          width="330"
           outlined
           variant = 'tonal'
           color="primary"
         >
-          <!-- Title slot -->
-          <template v-slot:title>
-            <span class="">{{ $t('Réglages') }}</span>
-          </template>
+      
 
           <!-- Card content -->
-          <v-card-text class="bg-surface-light pt-4">
-            <h6>{{ $t('Activer la TVA') }}</h6>
+          <v-card-text class="bg-surface-light ">
             
-            <v-radio-group
-              v-model="tvaEnabled"
-              direction="horizontal"
-              inline
-              @change="handleTvaChange"
-            >
-              <v-radio
-                label="Oui"
-                value="1"
-              ></v-radio>
-              <v-radio
-                label="Non"
-                value="0"
-              ></v-radio>
-            </v-radio-group>
-
+            <div class="d-flex justify-content-between align-items-center" >
+              <div class="mr-3" :class="{ 'mt-2': tvaEnabled === '0' }">
+               <span class="ml-2">{{ $t('Activer la TVA') }}</span>
+          
+                <v-radio-group
+                  v-model="tvaEnabled"
+                  direction="horizontal"
+                  inline
+                  @change="handleTvaChange"
+                  
+                >
+                  <v-radio
+                    label="Oui"
+                    value="1"
+                  ></v-radio>
+                  <v-radio
+                    label="Non"
+                    value="0"
+                  ></v-radio>
+                </v-radio-group>
+              </div>
+            <!-- TODO when enabled adjest to default value 20%-->
             <v-text-field
               v-show="tvaEnabled === '1'"
               v-model="devis.tvaRate"
-              label="Taux de TVA (en %)"
+              label="TVA (en %)"
               type="number"
-              :style="{ width: '200px', fontSize: '14px' }"
+              :style="{ width: '30px', fontSize: '14px' }"
               class="mt-3"
-              outlined
+              variant ="solo"
               dense
             ></v-text-field>
+          </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -216,15 +221,15 @@
             <v-simple-table dense class="invoice-totals-table" >
               <tbody>
                 <tr>
-                  <td class="text-right font-weight-medium" style="width:200px">{{ $t('labels.totalHT') }}</td>
+                  <td class="text-right font-weight-medium" style="width:260px">{{ $t('labels.totalHT') }}</td>
                   <td class="text-right">{{ totalHT.toFixed(2) }} €</td>
                 </tr>
                 <tr>
-                  <td class="text-right font-weight-medium" style="width:200px">{{ $t('labels.tva') }} ({{ devis.tvaRate }}%)</td>
+                  <td class="text-right font-weight-medium" style="width:260px">{{ $t('labels.tva') }} ({{ devis.tvaRate }}%)</td>
                   <td class="text-right">{{ tva.toFixed(2) }} €</td>
                 </tr>
                 <tr class="total-ttc">
-                  <td class="text-right font-weight-bold" style="width:200px">{{ $t('labels.totalTTC') }}</td>
+                  <td class="text-right font-weight-bold" style="width:260px">{{ $t('labels.totalTTC') }}</td>
                   <td class="text-right font-weight-bold">{{ totalTTC.toFixed(2) }} €</td>
                 </tr>
               </tbody>
@@ -233,7 +238,7 @@
         </v-col>
 
         <!-- Submit Button -->
-        <v-btn @click="submitDevis" color="success" class="mt-5">
+        <v-btn @click="submitDevis" color="success" class="mt-5" block >
           {{ $t('Génerer le pdf') }}
         </v-btn>
 
@@ -243,133 +248,133 @@
   </template>
   
   <script>
-  import axios from 'axios';
-  export default {
-    data() {
-      return {
-        devis: {
-          number: 1,
-          companyName: "",
-          adressPro : "",
-          cityPro: "",
-          siret: "",
-          clientName: "",
-          clientAdress:"",
-          cityClient :"",
-          clientSiret: "",
-          tvaRate: 20,
-          items: [{ description: "", quantity: 1, unitPrice: 0, totalPrice: 0 }],
+    import axios from 'axios';
+    export default {
+      data() {
+        return {
+          devis: {
+            number: 1,
+            companyName: "",
+            adressPro : "",
+            cityPro: "",
+            siret: "",
+            clientName: "",
+            clientAdress:"",
+            cityClient :"",
+            clientSiret: "",
+            tvaRate: 20,
+            items: [{ description: "", quantity: 1, unitPrice: 0, totalPrice: 0 }],
+          },
+        
+          
+          tvaEnabled : '1',
+        };
+      },
+    
+      computed: {
+        totalHT() {
+          return this.devis.items.reduce((sum, item) => sum + item.totalPrice, 0);
         },
-       
-        
-        tvaEnabled : '1',
-      };
-    },
-  
-    computed: {
-      totalHT() {
-        return this.devis.items.reduce((sum, item) => sum + item.totalPrice, 0);
+        tva() {
+          if(this.tvaEnabled =='1'){
+          return this.totalHT * (this.devis.tvaRate /100);
+          } return 0;
+
+
+        },
+        totalTTC() {
+          return this.totalHT + this.tva;
+        },
       },
-      tva() {
-        if(this.tvaEnabled =='1'){
-        return this.totalHT * (this.devis.tvaRate /100);
-        } return 0;
-
-
+      methods: {
+        addItem() {
+          this.devis.items.push({
+            description: "",
+            quantity: 1,
+            unitPrice: 0,
+            totalPrice: 0,
+          });
+        },
+        calculateTotal(index) {
+          const item = this.devis.items[index];
+          item.totalPrice = item.quantity * item.unitPrice;
+        },
+        removeItem(index) {
+          this.devis.items.splice(index, 1); 
+        },
+        handleTvaChange(value) {
+        if (value.target.value === '0') {
+          this.devis.tvaRate = 0;
+          
+        }else this.devis.tvaRate = 20;
+        console.log("event radio")
       },
-      totalTTC() {
-        return this.totalHT + this.tva;
+
+        async fetchCsrfCookie() {
+        try {
+          // This request will set the CSRF token cookie
+          await axios.get('https://devis.medadev.com/sanctum/csrf-cookie');
+        } catch (error) {
+          console.error('Failed to fetch CSRF cookie:', error);
+        }
       },
-    },
-    methods: {
-      addItem() {
-        this.devis.items.push({
-          description: "",
-          quantity: 1,
-          unitPrice: 0,
-          totalPrice: 0,
-        });
+        async submitDevis() {
+          await this.fetchCsrfCookie();
+        try {
+          const response = await axios.post("https://devis.medadev.com/api/devis", {
+            pro_name: this.devis.companyName,
+            pro_address: this.devis.adressPro,
+            pro_city: this.devis.cityPro,
+            pro_siret: this.devis.siret,
+            client_name: this.devis.clientName,
+            client_address: this.devis.clientAdress,
+            client_city: this.devis.cityClient,
+            client_siret: this.devis.clientSiret,
+            description: this.devis.number, // TODO CHANGE add new field for devis number,
+            amount: this.totalHT,
+            tax_rate : this.devis.tvaRate,  
+            date_devis: new Date().toISOString().split("T")[0],
+            tasks: this.devis.items.map(item => ({
+              item_description: item.description,
+              item_price: item.unitPrice,
+              item_quantity: item.quantity,
+            })),
+          });
+          console.log(response.data);
+          const devisId = response.data.devis.id; // change id by uuid
+          this.generatePdf(devisId);
+        // alert("Devis successfully submitted!");
+        } catch (error) {
+          console.error(error);
+          alert("Verifier tout vos information.");
+        }
       },
-      calculateTotal(index) {
-        const item = this.devis.items[index];
-        item.totalPrice = item.quantity * item.unitPrice;
+
+      async generatePdf(devisId) {
+        try {
+          
+          const response = await axios.get(`https://devis.medadev.com/api/generate-pdf/${devisId}`, {
+            responseType: 'blob', // Important for receiving binary data
+          });
+
+          // Create a Blob from the PDF Stream
+          const file = new Blob([response.data], { type: 'application/pdf' });
+
+          // Create a link element, use it to download the blob, then remove it
+          const fileURL = URL.createObjectURL(file);
+          const link = document.createElement('a');
+          link.href = fileURL;
+          link.download = `devis_${devisId}.pdf`;
+          link.click();
+          URL.revokeObjectURL(fileURL);
+
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+          alert('Error generating PDF. Please try again.');
+        }
       },
-      removeItem(index) {
-        this.devis.items.splice(index, 1); 
       },
-      handleTvaChange(value) {
-      if (value.target.value === '0') {
-        this.devis.tvaRate = 0;
-        
-      }
-      console.log("event radio")
-    },
-
-      async fetchCsrfCookie() {
-      try {
-        // This request will set the CSRF token cookie
-        await axios.get('https://devis.medadev.com/sanctum/csrf-cookie');
-      } catch (error) {
-        console.error('Failed to fetch CSRF cookie:', error);
-      }
-    },
-      async submitDevis() {
-        await this.fetchCsrfCookie();
-      try {
-        const response = await axios.post("https://devis.medadev.com/api/devis", {
-          pro_name: this.devis.companyName,
-          pro_address: this.devis.adressPro,
-          pro_city: this.devis.cityPro,
-          pro_siret: this.devis.siret,
-          client_name: this.devis.clientName,
-          client_address: this.devis.clientAdress,
-          client_city: this.devis.cityClient,
-          client_siret: this.devis.clientSiret,
-          description: this.devis.number, // TODO CHANGE add new field for devis number,
-          amount: this.totalHT,
-          tax_rate : this.devis.tvaRate,  
-          date_devis: new Date().toISOString().split("T")[0],
-          tasks: this.devis.items.map(item => ({
-            item_description: item.description,
-            item_price: item.unitPrice,
-            item_quantity: item.quantity,
-          })),
-        });
-        console.log(response.data);
-        const devisId = response.data.devis.id; // change id by uuid
-        this.generatePdf(devisId);
-       // alert("Devis successfully submitted!");
-      } catch (error) {
-        console.error(error);
-        alert("Verifier tout vos information.");
-      }
-    },
-
-    async generatePdf(devisId) {
-      try {
-        
-        const response = await axios.get(`https://devis.medadev.com/api/generate-pdf/${devisId}`, {
-          responseType: 'blob', // Important for receiving binary data
-        });
-
-        // Create a Blob from the PDF Stream
-        const file = new Blob([response.data], { type: 'application/pdf' });
-
-        // Create a link element, use it to download the blob, then remove it
-        const fileURL = URL.createObjectURL(file);
-        const link = document.createElement('a');
-        link.href = fileURL;
-        link.download = `devis_${devisId}.pdf`;
-        link.click();
-        URL.revokeObjectURL(fileURL);
-
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Error generating PDF. Please try again.');
-      }
-    },
-    },
-  };
+    };
   </script>
   
   <style scoped>
