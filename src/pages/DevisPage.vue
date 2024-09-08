@@ -89,11 +89,11 @@
                 </v-text-field>
             </div>
           </section>
-   
+
           <!-- Main Body - Growable Table -->
             <v-row>
                 <v-col >
-              <v-simple-table >
+              <v-simple-table  >
                 <template v-slot:default>
                   <thead>
                     <tr>
@@ -161,7 +161,6 @@
           <v-row class="justify-end">
             <v-col cols="auto">
               <v-card
-                
                 title ='Réglages'
                 class="mx-auto ma-1 pa-1"
                 width="330"
@@ -169,8 +168,6 @@
                 variant = 'tonal'
                 color="primary"
               >
-            
-
                 <!-- Card content -->
                 <v-card-text class="bg-surface-light ">
                   
@@ -233,8 +230,6 @@
           </v-row>
         </v-container>
 
-
-
         <!--TOTAL TABLE  --> 
         <v-col  cols="12" >
           <div class="d-flex flex-column align-end" >
@@ -275,20 +270,19 @@
       setup() {
       const infoGeneralStore = useInfoGeneralStore();
       const selectedCurrency = ref(null);
-    // Fetch currencies when component is mounted
+
       onMounted(() => {
-          infoGeneralStore.fetchCurrencies().then(() => {
-              // Set the default selected currency to the first item in the list
+        infoGeneralStore.fetchServices();
+        infoGeneralStore.fetchCurrencies().then(() => {
+        // Set the default selected currency to the first item in the list
             if (infoGeneralStore.currencies.length > 0) {
-                selectedCurrency.value = infoGeneralStore.currencies[0].code;
-               
+                selectedCurrency.value = infoGeneralStore.currencies[0].code;     
             }
-          });
         });
-        const currencyCodes = computed(() => 
-          infoGeneralStore.currencies.map(currency => currency.code)       
-        );
-        const formatCurrency = (amount) => {
+      });
+
+      const currencyCodes = computed(() => infoGeneralStore.currencies.map(currency => currency.code));
+      const formatCurrency = (amount) => {
           const currency = infoGeneralStore.currencies.find(currency => currency.code === selectedCurrency.value);
           if (currency && currency.symbol) {
             return `${amount.toFixed(2)} ${currency.symbol}`;
@@ -318,8 +312,6 @@
             tvaRate: 20,
             items: [{ description: "", quantity: 1, unitPrice: 0, totalPrice: 0 }],
           },
-        
-          
           tvaEnabled : '1',
         };
       },
@@ -327,23 +319,14 @@
         totalHT() {
           return this.devis.items.reduce((sum, item) => sum + item.totalPrice, 0);
         },
-        tva() {
-          if(this.tvaEnabled =='1'){
-          return this.totalHT * (this.devis.tvaRate /100);
-          } return 0;
-
-
+        tva() {        
+          return this.tvaEnabled === '1' ? this.totalHT * (this.devis.tvaRate / 100) : 0;
         },
         totalTTC() {
           return this.totalHT + this.tva;
         },
       },
       methods: {
-        getInfo(){
-            console.log('info')
-        },
-
-
         addItem() {
           this.devis.items.push({
             description: "",
