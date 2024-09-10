@@ -359,7 +359,7 @@
         async submitDevis() {
           await this.fetchCsrfCookie();
         try {
-          const response = await axios.post("https://devis.medadev.com/api/devis", {
+          const response = await axios.post("http://localhost/devis-app/public/api/devis", {
             pro_name: this.devis.companyName,
             pro_address: this.devis.adressPro,
             pro_city: this.devis.cityPro,
@@ -390,7 +390,7 @@
       async generatePdf(devisId) {
         try {
           
-          const response = await axios.get(`https://devis.medadev.com/api/generate-pdf/${devisId}`, {
+          const response = await axios.get(`http://localhost/devis-app/public/api/generate-pdf/${devisId}`, {
             responseType: 'blob', // Important for receiving binary data
           });
 

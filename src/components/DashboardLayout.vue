@@ -11,8 +11,8 @@
         <v-list color="transparent">
           <v-list-item @click="navigateTo('DevisPage')" prepend-icon="mdi-view-dashboard" title="Home"></v-list-item>
           <v-list-item @click="navigateTo('informations')" prepend-icon="mdi-account-box" title="Informations"></v-list-item>
-          <v-list-item @click="navigateTo('MesDevis')" prepend-icon="mdi-file-document" title="Mes Devis"></v-list-item>
-          <v-list-item @click="navigateTo('Services')" prepend-icon="mdi-gavel" title="Services"></v-list-item>
+          <v-list-item @click="navigateTo('devis')" prepend-icon="mdi-file-document" title="Mes Devis"></v-list-item>
+          <v-list-item @click="navigateTo('services')" prepend-icon="mdi-gavel" title="Services"></v-list-item>
         </v-list>
   
         <template v-slot:append>
@@ -25,7 +25,7 @@
       </v-navigation-drawer>
   
       <v-app-bar app clipped-left>
-        <v-toolbar-title>Hello Amine</v-toolbar-title>
+        <v-toolbar-title>Hello {{userStore.user.first_name}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <!-- Add other toolbar items here -->
       </v-app-bar>

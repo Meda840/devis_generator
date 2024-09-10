@@ -10,8 +10,8 @@
       <v-list color="transparent">
           <v-list-item @click="navigateTo('DevisPage')" prepend-icon="mdi-view-dashboard" title="Home"></v-list-item>
           <v-list-item @click="navigateTo('informations')" prepend-icon="mdi-account-box" title="Informations"></v-list-item>
-          <v-list-item @click="navigateTo('DevisPage')" prepend-icon="mdi-file-document" title="Mes Devis"></v-list-item>
-          <v-list-item @click="navigateTo('DevisPage')" prepend-icon="mdi-gavel" title="Services"></v-list-item>
+          <v-list-item @click="navigateTo('devis')" prepend-icon="mdi-file-document" title="Mes Devis"></v-list-item>
+          <v-list-item @click="navigateTo('services')" prepend-icon="mdi-gavel" title="Services"></v-list-item>
         </v-list>
 
         <template v-slot:append>
