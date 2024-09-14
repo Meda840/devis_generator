@@ -21,19 +21,15 @@
                 <td>
               <v-row align="center" justify="center">
                 <v-col cols="auto">
-                <v-btn size="small" icon @click="userStore.generatePdf(item.id)" title="Download PDF">
+                <v-btn size="small" icon @click="userStore.generatePdf(item.id)" title="Télecharger PDF">
                   <v-icon>mdi-file-pdf</v-icon>
                 </v-btn>
                 </v-col>
-                <v-col  cols="auto">
-                <v-btn  size="small" icon @click="modifyDevis(item.id)" title="Modify Devis">
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                 </v-col>
+              
                  <v-col  cols="auto">
-                <v-btn size="small" icon @click="deleteDevis(item.id)" title="Delete Devis">
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
+                    <v-btn size="small" icon @click="confirmDelete(item.id)" title="Supprimer">
+                    <v-icon>mdi-delete</v-icon>
+                    </v-btn>
                  </v-col>
               </v-row>
 
@@ -42,6 +38,29 @@
           </template>
         </v-data-table>
       </v-container>
+      <v-dialog
+      v-model="showConfirmCard"
+      max-width="400"
+    >
+
+      <v-card
+        prepend-icon="mdi-map-marker"
+        text="Etes vous sur de voulour supprimer ce devis, les infrmtions seront supprimes."
+        title="Supprimer le devis?"
+      >
+        <template v-slot:actions>
+          <v-spacer></v-spacer>
+
+          <v-btn @click="cancelDelete">
+            {{$t("Annuler")}}
+          </v-btn>
+
+          <v-btn @click="cancelDelete">
+            {{$t("Confirmer")}}
+          </v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
     </DashboardLayout>
   </template>
   
@@ -52,6 +71,9 @@
   
   const userStore = useUserStore();
   const devis = ref([]);
+  const showConfirmCard = ref(false);
+  const loadingConfirm = ref(false);
+  const currentItemId = ref(null);
   const headers = ref([
     { title: 'Reference', value: 'id' },
     { title: 'Client', value: 'client_name' },
@@ -63,6 +85,17 @@
   const totalItems = ref(0);
   const search = ref('');
   const loading = ref(true);
+
+ 
+
+    const confirmDelete = (id) => {
+    currentItemId.value = id;
+    showConfirmCard.value = true;
+    };
+    const cancelDelete = () => {
+    showConfirmCard.value = false;
+    };
+
   
   const loadItems = async ({ page, itemsPerPage, sortBy }) => {
     loading.value = true;
