@@ -6,6 +6,7 @@ export const useUserStore = defineStore("user", {
     token: null,
     isLoggedIn: false,
     user: {
+      id: null,
       first_name: null,
       last_name: null,
       email: null,
@@ -19,6 +20,7 @@ export const useUserStore = defineStore("user", {
       siret: null,
     },
     isUpdatingCompany: false,
+    devis: [],
   }),
   actions: {
     async login(email, password) {
@@ -75,7 +77,7 @@ export const useUserStore = defineStore("user", {
         this.isLoggedIn = true;
         axios.defaults.headers.common["Authorization"] = `Bearer ${this.token}`;
         axios.defaults.withCredentials = true;
-        // axios.defaults.withXSRFToken = true;
+        axios.defaults.withXSRFToken = true;
         this.getUserInfo();
       }
     },
@@ -97,6 +99,8 @@ export const useUserStore = defineStore("user", {
         } else {
           this.isUpdatingCompany = false; // No company exists, so we'll create one
         }
+
+        console.log("user info :", this.user.id);
       } catch (error) {
         console.error(
           "Failed to retrieve user info:",
@@ -150,6 +154,50 @@ export const useUserStore = defineStore("user", {
           error.response?.data?.message || error.message
         );
         throw error; // Re-throw error to handle it in the component
+      }
+    },
+
+    async fetchAllDevis() {
+      try {
+        await this.getCsrfCookie();
+        const response = await axios.get(
+          "http://localhost/devis-app/public/api/user/devis",
+          {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        this.devis = response.data.devis;
+        console.log("devis retrieved");
+      } catch (error) {
+        console.error(
+          "Failed to fetch devis:",
+          error.response?.data?.message || error.message
+        );
+      }
+    },
+
+    async generatePdf(devisId) {
+      try {
+        const response = await axios.get(
+          `http://localhost/devis-app/public/api/generate-pdf/${devisId}`,
+          {
+            responseType: "blob",
+          }
+        );
+
+        const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.href = fileURL;
+        link.download = `devis_${devisId}.pdf`;
+        link.click();
+        URL.revokeObjectURL(fileURL);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        alert("Error generating PDF. Please try again.");
       }
     },
   },

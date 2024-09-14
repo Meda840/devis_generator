@@ -32,7 +32,7 @@
                 class="col-lg-5 col-sm-8 mb-0"
               ></v-text-field>
               <v-text-field
-                v-model="devis.cityPro"
+                v-model="devis.codePostalPro"
                 :placeholder="$t('Code Postal')"
                 dense
                 hide-details
@@ -270,6 +270,7 @@
       setup() {
       const infoGeneralStore = useInfoGeneralStore();
       const selectedCurrency = ref(null);
+      const isLogged = ref(false);
 
       onMounted(() => {
         infoGeneralStore.fetchServices();
@@ -279,6 +280,9 @@
                 selectedCurrency.value = infoGeneralStore.currencies[0].code;     
             }
         });
+
+        isLogged.value = infoGeneralStore.checkUserLoggedIn();
+        console.log(isLogged.value)
       });
 
       const currencyCodes = computed(() => infoGeneralStore.currencies.map(currency => currency.code));
@@ -304,6 +308,7 @@
             companyName: "",
             adressPro : "",
             cityPro: "",
+            codePostalPro: "",
             siret: "",
             clientName: "",
             clientAdress:"",
@@ -350,16 +355,17 @@
       },
         async fetchCsrfCookie() {
         try {
-          // This request will set the CSRF token cookie
-          await axios.get('https://devis.medadev.com/sanctum/csrf-cookie');
+          await axios.get("http://localhost/devis-app/public/sanctum/csrf-cookie");
         } catch (error) {
           console.error('Failed to fetch CSRF cookie:', error);
         }
       },
         async submitDevis() {
-          await this.fetchCsrfCookie();
+        await this.fetchCsrfCookie();
+        console.log(this.infoGeneralStore.user.id);
         try {
           const response = await axios.post("http://localhost/devis-app/public/api/devis", {
+            user_id:this.infoGeneralStore.user.id,
             pro_name: this.devis.companyName,
             pro_address: this.devis.adressPro,
             pro_city: this.devis.cityPro,

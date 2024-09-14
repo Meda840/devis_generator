@@ -5,9 +5,40 @@ export const useInfoGeneralStore = defineStore("infoGeneral", {
   state: () => ({
     currencies: [],
     services: [],
+    isUserLogged: false,
+    user: {
+      id: null,
+      first_name: null,
+      last_name: null,
+      email: null,
+    },
   }),
 
   actions: {
+    async checkUserLoggedIn() {
+      const token = localStorage.getItem("token");
+      await axios.get("http://localhost/devis-app/public/sanctum/csrf-cookie");
+      axios.defaults.withXSRFToken = true;
+      axios.defaults.withCredentials = true;
+      axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+      if (token) {
+        const response = await axios.get(
+          "http://localhost/devis-app/public/api/user",
+          {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        this.user = response.data;
+
+        return true;
+      } else {
+        return false;
+      }
+    },
+
     async fetchCurrencies() {
       try {
         const response = await axios.get(
