@@ -51,7 +51,7 @@ setup() {
   const userStore = useUserStore();
   onMounted(() => {
       userStore.initialize();
-      console.log(userStore.token)
+      console.log(userStore.token);
     });
   return {
     userStore,

@@ -13,8 +13,11 @@
         </v-card-title>
         <v-card-text>
           <section>
-            <div class="d-flex flex-column align-start mt-4">
-              
+            <div class="d-flex flex-column align-start mt-4">   
+               
+            <v-btn  v-if="infoGeneralStore.userCompany" @click="toggleCompanyInfo" class="mt-4">
+      {{ isCompanyInfoImported ? $t('Erase Info') : $t('Import Info') }}
+    </v-btn>  
               <v-text-field
                 v-model="devis.companyName"
                 :placeholder="$t('devis.companyName')"
@@ -271,19 +274,21 @@
       const infoGeneralStore = useInfoGeneralStore();
       const selectedCurrency = ref(null);
       const isLogged = ref(false);
+      const isCompanyInfoImported = ref(false);
 
       onMounted(() => {
+        infoGeneralStore.checkUserLoggedIn().then(() => {
+          console.log("info user retrieved")
+          console.log(infoGeneralStore.userCompany)
+        });
         infoGeneralStore.fetchServices();
         infoGeneralStore.fetchCurrencies().then(() => {
-        // Set the default selected currency to the first item in the list
             if (infoGeneralStore.currencies.length > 0) {
                 selectedCurrency.value = infoGeneralStore.currencies[0].code;     
             }
         });
-
-        isLogged.value = infoGeneralStore.checkUserLoggedIn();
-        console.log(isLogged.value)
       });
+      
 
       const currencyCodes = computed(() => infoGeneralStore.currencies.map(currency => currency.code));
       const formatCurrency = (amount) => {
@@ -293,12 +298,15 @@
           }
           return `${amount.toFixed(2)} €`; // Fallback if no currency is selected
         };
+      
 
         return {
             infoGeneralStore,
             selectedCurrency,
             currencyCodes,
-            formatCurrency
+            formatCurrency,
+            isCompanyInfoImported
+            
         };
       },
       data() {
@@ -353,6 +361,32 @@
         }else this.devis.tvaRate = 20;
        
       },
+      toggleCompanyInfo() {
+        if (this.isCompanyInfoImported) {
+          this.eraseCompanyInfo();
+        } else {
+          this.importCompanyInfo();
+        }
+      },
+      importCompanyInfo() {
+        if (this.infoGeneralStore.userCompany) {
+          this.devis.companyName = this.infoGeneralStore.userCompany.name || '';
+          this.devis.adressPro = this.infoGeneralStore.userCompany.address || '';
+          this.devis.codePostalPro = this.infoGeneralStore.userCompany.postal_code || '';
+          this.devis.cityPro = this.infoGeneralStore.userCompany.city || '';
+          this.devis.siret = this.infoGeneralStore.userCompany.siret || '';
+          this.isCompanyInfoImported = true;
+        }
+      },
+      eraseCompanyInfo() {
+        this.devis.companyName = "";
+        this.devis.adressPro = "";
+        this.devis.codePostalPro = "";
+        this.devis.cityPro = "";
+        this.devis.siret = "";
+        this.isCompanyInfoImported = false;
+      },
+
         async fetchCsrfCookie() {
         try {
           await axios.get("http://localhost/devis-app/public/sanctum/csrf-cookie");
@@ -362,7 +396,11 @@
       },
         async submitDevis() {
         await this.fetchCsrfCookie();
-        console.log(this.infoGeneralStore.user.id);
+        if(this.infoGeneralStore.user.id ){
+          console.log(this.infoGeneralStore.user.value.id);
+          console.log("user connected")
+        }
+       
         try {
           const response = await axios.post("http://localhost/devis-app/public/api/devis", {
             user_id:this.infoGeneralStore.user.id,
@@ -491,4 +529,3 @@
   background-color: white;
 }
   </style>
-  @/stores/InfoGeneral

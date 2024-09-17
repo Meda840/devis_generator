@@ -115,7 +115,3 @@
   });
   </script>
   
-  <style>
-  /* Add any necessary styling here */
-  </style>
-  

@@ -12,31 +12,50 @@ export const useInfoGeneralStore = defineStore("infoGeneral", {
       last_name: null,
       email: null,
     },
+    userCompany: {
+      id: null,
+      name: null,
+      address: null,
+      postal_code: null,
+      city: null,
+      siret: null,
+    },
   }),
 
   actions: {
     async checkUserLoggedIn() {
       const token = localStorage.getItem("token");
       await axios.get("http://localhost/devis-app/public/sanctum/csrf-cookie");
-      axios.defaults.withXSRFToken = true;
       axios.defaults.withCredentials = true;
       axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
       if (token) {
-        const response = await axios.get(
-          "http://localhost/devis-app/public/api/user",
-          {
-            headers: {
-              Authorization: `Bearer ${this.token}`,
-              Accept: "application/json",
-            },
+        try {
+          const response = await axios.get(
+            "http://localhost/devis-app/public/api/user/companies",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+              },
+            }
+          );
+          this.user = response.data.user;
+          if (response.data.companies && response.data.companies.length > 0) {
+            this.userCompany = response.data.companies[0];
+            console.log(
+              "user comapany from infogeneral store ",
+              this.userCompany
+            );
           }
-        );
-        this.user = response.data;
-
-        return true;
-      } else {
-        return false;
+          if (this.user && this.user.id) {
+            return true;
+          }
+        } catch (error) {
+          console.error("Error fetching user or company data:", error);
+        }
       }
+      console.log("user not connected");
+      return false;
     },
 
     async fetchCurrencies() {
