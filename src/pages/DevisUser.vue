@@ -55,7 +55,7 @@
             {{$t("Annuler")}}
           </v-btn>
 
-          <v-btn @click="cancelDelete">
+          <v-btn @click="confirmDelete">
             {{$t("Confirmer")}}
           </v-btn>
         </template>
@@ -90,6 +90,7 @@
 
     const confirmDelete = (id) => {
     currentItemId.value = id;
+   console.log(currentItemId.value);
     showConfirmCard.value = true;
     };
     const cancelDelete = () => {

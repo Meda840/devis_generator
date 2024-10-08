@@ -80,5 +80,7 @@ export const useInfoGeneralStore = defineStore("infoGeneral", {
         console.error("Failed to fetch services:", error);
       }
     },
+
+    async deleteDevisById(id) {},
   },
 });

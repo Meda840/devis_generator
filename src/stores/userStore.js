@@ -200,5 +200,28 @@ export const useUserStore = defineStore("user", {
         alert("Error generating PDF. Please try again.");
       }
     },
+
+    async deleteDevis(devisId) {
+      try {
+        await this.getCsrfCookie(); // Ensure CSRF token is valid
+        await axios.delete(
+          `http://localhost/devis-app/public/api/devis/${devisId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+        this.devis = this.devis.filter((devis) => devis.id !== devisId);
+        alert("Devis deleted successfully");
+      } catch (error) {
+        console.error(
+          "Failed to delete devis:",
+          error.response?.data?.message || error.message
+        );
+        alert("Failed to delete devis. Please try again.");
+      }
+    },
   },
 });

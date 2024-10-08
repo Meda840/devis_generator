@@ -289,7 +289,6 @@
         });
       });
       
-
       const currencyCodes = computed(() => infoGeneralStore.currencies.map(currency => currency.code));
       const formatCurrency = (amount) => {
           const currency = infoGeneralStore.currencies.find(currency => currency.code === selectedCurrency.value);
@@ -397,7 +396,7 @@
         async submitDevis() {
         await this.fetchCsrfCookie();
         if(this.infoGeneralStore.user.id ){
-          console.log(this.infoGeneralStore.user.value.id);
+    
           console.log("user connected")
         }
        
